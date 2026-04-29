@@ -1,0 +1,20 @@
+{
+  "name": "SafeWord Authenticator",
+  "short_name": "SafeWord",
+  "description": "Dual-mode secure authenticator: TOTP for all services + FSOTP with forward secrecy",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#070b14",
+  "theme_color": "#070b14",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%23070b14'/><text y='380' x='60' font-size='380'>🔐</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["security", "utilities"],
+  "lang": "en"
+}

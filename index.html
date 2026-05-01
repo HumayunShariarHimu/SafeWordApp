@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>SafeWord NextGen — Beyond Google Auth</title>
+  <meta name="description" content="SafeWord NextGen: Next-generation authenticator. TOTP + FSOTP + SafeWord mode. Google Auth-এর চেয়ে 1677× শক্তিশালী।"/>
+  <meta name="theme-color" content="#010204"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="SafeWord"/>
+  <meta name="referrer" content="no-referrer"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="stylesheet" href="./style.css"/>
+  <style>
+    /* ══ MOBILE RESPONSIVE CRITICAL FIXES ══ */
+    html, body {
+      overflow-x: hidden !important;
+      max-width: 100vw !important;
+    }
+    .app {
+      overflow-x: hidden;
+      max-width: 100vw;
+    }
+    [data-screen] {
+      overflow-x: hidden;
+      max-width: 100vw;
+    }
+
+    /* ── Topbar: shrink on small screens ── */
+    .topbar {
+      padding: 14px 10px 10px;
+      gap: 6px;
+      flex-wrap: nowrap;
+      overflow: hidden;
+    }
+    .topbar-brand {
+      font-size: .9rem;
+      flex-shrink: 1;
+      min-width: 0;
+    }
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      font-size: .9rem;
+      flex-shrink: 0;
+      border-radius: 10px;
+    }
+    .icon-btn.add {
+      font-size: 1.2rem;
+    }
+    .sw-toggle-btn {
+      font-size: .6rem;
+      padding: 0 8px;
+      height: 30px;
+      flex-shrink: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 80px;
+    }
+
+    /* ── Search row ── */
+    .search-row {
+      padding: 0 10px 10px;
+    }
+
+    /* ── Mode tabs ── */
+    .mode-tabs {
+      margin: 0 10px 12px;
+    }
+    .mode-tab {
+      font-size: .62rem;
+      padding: 9px 4px;
+      letter-spacing: .02em;
+    }
+
+    /* ── Account cards ── */
+    .accounts-wrap {
+      padding: 0 10px;
+    }
+    .acc-card {
+      padding: 12px 10px 8px;
+      gap: 8px;
+    }
+    .acc-brand {
+      width: 40px;
+      height: 40px;
+      font-size: .95rem;
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+    .acc-issuer {
+      font-size: .82rem;
+    }
+    .acc-account {
+      font-size: .66rem;
+    }
+    .acc-otp {
+      font-size: 1.18rem;
+      letter-spacing: .06em;
+    }
+    .acc-ring-wrap svg {
+      width: 32px;
+      height: 32px;
+    }
+    .sw-code {
+      font-size: .58rem;
+    }
+
+    /* ── Lock screen ── */
+    #screen-lock {
+      padding: 16px 12px;
+    }
+    #lock-card {
+      padding: 28px 18px;
+    }
+    .lock-brand {
+      font-size: 1.6rem;
+    }
+    .lock-orb {
+      width: 68px;
+      height: 68px;
+      font-size: 30px;
+    }
+    .lock-pills {
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .lock-pill {
+      font-size: .62rem;
+      padding: 8px 10px;
+    }
+
+    /* ── FSOTP intro ── */
+    #fsotp-intro {
+      margin: 0 10px;
+    }
+    #fsotp-wrap {
+      padding: 0 10px !important;
+    }
+    .fsotp-security-bar {
+      margin: 4px 10px 0;
+    }
+
+    /* ── Add screen ── */
+    .add-body {
+      padding: 12px 10px;
+    }
+    .add-mode-tabs {
+      gap: 3px;
+    }
+    .add-mode-tab {
+      font-size: .62rem;
+      padding: 8px 4px;
+    }
+    .scanner-wrap {
+      max-width: 100%;
+    }
+    .fsotp-setup-card {
+      padding: 14px;
+    }
+
+    /* ── Settings screen ── */
+    .settings-body {
+      padding: 12px 10px;
+    }
+    .s-row {
+      padding: 11px 12px;
+      gap: 8px;
+    }
+    .s-label {
+      font-size: .8rem;
+    }
+
+    /* ── FSOTP detail screen ── */
+    .fsotp-detail-body {
+      padding: 12px 10px;
+    }
+    .fs-info-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .fs-sw-words {
+      gap: 5px;
+    }
+    .fs-sw-word {
+      font-size: .72rem;
+      padding: 4px 9px;
+    }
+
+    /* ── How It Works screen ── */
+    .hiw-body {
+      padding: 12px 10px;
+    }
+    .hiw-section {
+      padding: 14px;
+    }
+    .compare-table th,
+    .compare-table td {
+      font-size: .58rem;
+      padding: 6px 7px;
+    }
+    .hiw-formula {
+      font-size: .6rem;
+      padding: 8px 10px;
+      word-break: break-all;
+    }
+
+    /* ── Page header ── */
+    .page-header {
+      padding: 14px 10px 0;
+    }
+    .page-title {
+      font-size: .88rem;
+    }
+
+    /* ── Form elements ── */
+    input[type=text], input[type=password],
+    input[type=number], input[type=email],
+    select, textarea {
+      font-size: .78rem;
+      padding: 10px 12px;
+    }
+    .form-row {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* ── Footer ── */
+    .app-footer {
+      font-size: .6rem;
+      padding: 12px 10px;
+    }
+    .sec-footer {
+      font-size: .6rem;
+      padding: 12px 10px;
+    }
+
+    /* ── Very small screens (< 360px) ── */
+    @media (max-width: 360px) {
+      .topbar-brand { display: none; }
+      .sw-toggle-btn { max-width: 64px; font-size: .55rem; }
+      .lock-pills { grid-template-columns: 1fr; }
+      .fs-info-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .compare-table { font-size: .52rem; }
+      .acc-otp { font-size: 1.05rem; }
+      .preview-grid { grid-template-columns: 1fr; }
+      .add-mode-tab { font-size: .56rem; }
+    }
+
+    /* ── Landscape phone ── */
+    @media (max-height: 500px) {
+      .lock-hero { gap: 8px; margin-bottom: 16px; }
+      .lock-orb { width: 52px; height: 52px; font-size: 24px; }
+      .lock-pills { display: none; }
+      #lock-card { padding: 20px 18px; }
+    }
+  </style>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23010204'/><text y='24' x='3' font-size='24'>🛡</text></svg>"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"
+    integrity="sha512-+CirM7lhDOkL4/TmHHaFjWovSQ0tMnLaExdkL6ePsNEbTLHfTxsD9jqQPNj5FvPMIMlwBLbMEBIaexlsMCdA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+
+<!-- Scanlines effect -->
+<div class="scanlines"></div>
+
+<!-- Matrix rain canvas -->
+<canvas id="matrix-canvas"></canvas>
+
+<div id="toast-zone"></div>
+
+<!-- ── Delete Modal ─────────────────────────────────────── -->
+<div id="del-modal" class="modal-bd hidden">
+  <div class="modal">
+    <h3>🗑 Remove Account?</h3>
+    <p>Permanently delete <strong id="del-name"></strong> from SafeWord. This cannot be undone.</p>
+    <div class="btn-row">
+      <button class="btn btn-ghost btn-sm" style="flex:1" onclick="cancelDel()">Cancel</button>
+      <button class="btn btn-danger btn-sm" style="flex:1" onclick="doDel()">Remove</button>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+
+<!-- ══════════════════════════════════════════════════════════
+     LOCK SCREEN
+══════════════════════════════════════════════════════════ -->
+<div data-screen="lock" id="screen-lock">
+  <div id="lock-card" class="glass">
+    <div class="lock-hero">
+      <div class="lock-orb">🛡</div>
+      <div class="lock-brand">SafeWord</div>
+      <div class="lock-ver">v3 · NextGen Authenticator · Beyond Google Auth</div>
+    </div>
+
+    <h2 id="lock-title">Create Vault</h2>
+    <p id="lock-sub">Set a strong master password to protect your accounts</p>
+
+    <div class="pw-field">
+      <input type="password" id="lock-pw" placeholder="Master password" autocomplete="current-password"/>
+      <button class="eye" onclick="toggleVis('lock-pw',this)">👁</button>
+    </div>
+
+    <button class="btn btn-primary" id="lock-btn" onclick="doUnlock()">Create Vault</button>
+
+    <div id="lock-reset"
+      onclick="if(confirm('Wipe entire vault? Cannot undo!')){{localStorage.clear();location.reload()}}">
+      Forgot password? Reset vault
+    </div>
+
+    <div class="lock-pills">
+      <div class="lock-pill"><b>🔑 SafeWord Mode</b>1677× stronger than 6-digit OTP</div>
+      <div class="lock-pill purple"><b>🛡 FSOTP + Ratchet</b>Past theft ≠ Future codes</div>
+      <div class="lock-pill"><b>🔒 AES-256-GCM</b>Military-grade encryption</div>
+      <div class="lock-pill"><b>⚡ PBKDF2×310K</b>Brute-force resistant KDF</div>
+      <div class="lock-pill green"><b>⏱ Live Countdown</b>Animated 30s timer per code</div>
+      <div class="lock-pill"><b>🌐 Zero Servers</b>100% local & offline PWA</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     MAIN SCREEN
+══════════════════════════════════════════════════════════ -->
+<div data-screen="main" id="screen-main">
+  <div class="topbar">
+    <div class="topbar-brand">SafeWord</div>
+    <button class="sw-toggle-btn" id="sw-toggle" onclick="toggleSafeWordMode()" title="Toggle SafeWord word-based codes">
+      ○ SafeWord
+    </button>
+    <button class="icon-btn" onclick="show('how-it-works')" title="How it works">❓</button>
+    <button class="icon-btn" onclick="show('settings')" title="Settings">⚙</button>
+    <button class="icon-btn" onclick="doLock()" title="Lock">🔒</button>
+    <button class="icon-btn add" onclick="show('add')" title="Add account">+</button>
+  </div>
+
+  <div class="search-row">
+    <input type="text" id="search" placeholder="Search accounts…"
+      oninput="filterAccounts(this.value)"/>
+  </div>
+
+  <!-- Mode Tabs -->
+  <div class="mode-tabs">
+    <button class="mode-tab totp-tab active" id="main-tab-totp"
+      onclick="switchMainTab('totp')">🔑 TOTP Mode</button>
+    <button class="mode-tab fsotp-tab" id="main-tab-fsotp"
+      onclick="switchMainTab('fsotp')">🛡 FSOTP Mode</button>
+  </div>
+
+  <!-- TOTP Pane -->
+  <div class="mode-pane active" id="main-pane-totp">
+    <div class="accounts-wrap" id="totp-wrap"></div>
+  </div>
+
+  <!-- FSOTP Pane -->
+  <div class="mode-pane" id="main-pane-fsotp">
+    <div id="fsotp-wrap" style="padding:0 16px;display:flex;flex-direction:column;gap:0"></div>
+
+    <div class="fsotp-intro glass-sm" id="fsotp-intro">
+      <div class="fi-title">🛡 FSOTP — Forward-Secure OTP</div>
+      <div class="fi-body">
+        <span>Secret key চুরি হলেও</span> পরবর্তী কোড জানা <b class="safe">অসম্ভব!</b><br><br>
+        কারণ: প্রতি ৩০ সেকেন্ডে key ratchet হয়<br>
+        <span>S_{t+1} = SHA-256(S_t ∥ R_t)</span><br><br>
+        <span>R_t</span> = Server random — period শেষ না হওয়া পর্যন্ত <b class="warn">গোপন।</b><br>
+        এই R_t ছাড়া ভবিষ্যৎ কোড বের করতে <b class="warn">2²⁵⁶ চেষ্টা</b> লাগবে।
+      </div>
+      <button class="btn btn-violet btn-sm" onclick="show('add');setTimeout(()=>switchAddMode('fsotp'),50)">
+        + Add FSOTP Account
+      </button>
+    </div>
+  </div>
+
+  <div class="sec-footer">
+    🔒 AES-256-GCM · RFC 6238 TOTP + FSOTP + SafeWord · Tap code to copy<br>
+    <span style="color:var(--neon-purple);opacity:.6">SafeWord = 1,677,721,600 combinations · 1677× stronger than Google Auth</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     FSOTP DETAIL SCREEN
+══════════════════════════════════════════════════════════ -->
+<div data-screen="fsotp-detail" id="screen-fsotp-detail">
+  <div class="page-header">
+    <button class="back-btn" onclick="show('main');switchMainTab('fsotp')">←</button>
+    <div class="page-title">🛡 FSOTP — Forward Secure Detail</div>
+  </div>
+
+  <div class="fsotp-detail-body">
+
+    <!-- Big OTP + Ring timer -->
+    <div class="fs-otp-card glass">
+      <div class="fs-otp-label">FORWARD-SECURE ONE-TIME PASSWORD</div>
+      <div class="fs-timer-wrap">
+        <svg class="fs-svg" width="140" height="140" viewBox="0 0 140 140">
+          <circle class="fs-track" cx="70" cy="70" r="54"/>
+          <circle id="fs-ring" cx="70" cy="70" r="54"
+            stroke-dasharray="339.29" stroke-dashoffset="0"/>
+        </svg>
+        <div class="fs-center">
+          <div id="fs-otp" onclick="copyText('fs-otp')" title="Click to copy">--- ---</div>
+          <div id="fs-timeleft">--s</div>
+        </div>
+      </div>
+
+      <!-- Countdown progress bar in detail -->
+      <div class="detail-countdown-wrap">
+        <div class="detail-countdown-track">
+          <div class="detail-countdown-fill" id="fs-detail-bar" style="width:100%"></div>
+        </div>
+        <span class="detail-time-label" id="fs-detail-secs">30s</span>
+      </div>
+
+      <button class="fs-copy-btn" onclick="copyText('fs-otp')">⎘ Copy OTP</button>
+    </div>
+
+    <!-- SafeWord display in detail -->
+    <div class="fs-safeword-card glass-sm">
+      <div class="fs-sw-label">SafeWord Code (1677× stronger)</div>
+      <div class="fs-sw-words">
+        <span class="fs-sw-word" id="fs-sw-w1">WORD</span>
+        <span class="fs-sw-dot">·</span>
+        <span class="fs-sw-word" id="fs-sw-w2">WORD</span>
+        <span class="fs-sw-dot">·</span>
+        <span class="fs-sw-word" id="fs-sw-w3">WORD</span>
+        <span class="fs-sw-dot">·</span>
+        <span class="fs-sw-pin" id="fs-sw-pin">00</span>
+      </div>
+      <div class="fs-sw-full" id="fs-safeword" onclick="copyText2(_fsData?.safeWord||'')">
+        ⎘ Click to copy full SafeWord
+      </div>
+    </div>
+
+    <!-- Info cards -->
+    <div class="fs-info-grid">
+      <div class="fs-info-card">
+        <div class="fs-info-label">Period Index</div>
+        <div class="fs-info-val cyan" id="fs-period">—</div>
+      </div>
+      <div class="fs-info-card">
+        <div class="fs-info-label">Key Ratchets</div>
+        <div class="fs-info-val green" id="fs-ratchet">0</div>
+      </div>
+      <div class="fs-info-card" style="grid-column:span 2">
+        <div class="fs-info-label">Current Key S_t (Fingerprint)</div>
+        <div class="fs-info-val violet" id="fs-keyfp">—</div>
+      </div>
+    </div>
+
+    <!-- Commitment proof -->
+    <div class="sec-card glass-sm">
+      <div class="sec-card-title">
+        <span>Current Period — Proof Chain</span>
+        <button class="btn btn-ghost btn-sm" onclick="copyText('fs-commit')" style="font-size:.58rem;padding:3px 8px">Copy</button>
+      </div>
+      <div style="font-family:var(--mono);font-size:.58rem;color:var(--t3);margin-bottom:4px">COMMITMENT = SHA-256(R_t) [PUBLIC]</div>
+      <div class="sec-val" id="fs-commit">—</div>
+      <div style="font-family:var(--mono);font-size:.58rem;color:var(--t3);margin-bottom:4px">REVEALED RANDOM R_t [NOW PUBLIC]</div>
+      <div class="sec-val rand" id="fs-rand">—</div>
+    </div>
+
+    <!-- Next period -->
+    <div class="sec-card glass-sm">
+      <div class="sec-card-title">Next Period — Pre-Commitment</div>
+      <div style="font-family:var(--mono);font-size:.58rem;color:var(--t3);margin-bottom:4px">COMMITMENT = SHA-256(R_{t+1}) [PUBLIC]</div>
+      <div class="sec-val next" id="fs-nextcommit">—</div>
+      <div style="font-family:var(--mono);font-size:.6rem;color:var(--neon-amber);margin-top:6px;padding:8px 10px;background:rgba(255,170,0,.04);border-radius:8px;border:1px solid rgba(255,170,0,.12)">
+        🔒 R_{t+1} hidden — 2²⁵⁶ possibilities · Mathematically impossible to predict
+      </div>
+    </div>
+
+    <!-- Chain -->
+    <div class="sec-card glass-sm">
+      <div class="sec-card-title">Commitment Chain History</div>
+      <div id="fs-chain"></div>
+    </div>
+
+    <!-- Security banner -->
+    <div class="sec-banner">
+      <b>Why FSOTP is unbreakable even after key theft:</b><br>
+      Current key S_t চুরি হলে → attacker জানে S_t<br>
+      কিন্তু পরের OTP = HMAC(S_{t+1}, R_{t+1})<br>
+      S_{t+1} = SHA-256(S_t ∥ R_t) → R_t ছাড়া impossible<br>
+      R_{t+1} এখনও server-এ গোপন → <b>গাণিতিকভাবে অসম্ভব!</b>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     HOW IT WORKS SCREEN
+══════════════════════════════════════════════════════════ -->
+<div data-screen="how-it-works" id="screen-how-it-works">
+  <div class="page-header">
+    <button class="back-btn" onclick="show('main')">←</button>
+    <div class="page-title">❓ How SafeWord Works</div>
+  </div>
+
+  <div class="hiw-body">
+
+    <!-- Comparison table -->
+    <div class="hiw-section">
+      <div class="hiw-head green">📊 Security Comparison</div>
+      <table class="compare-table">
+        <thead>
+          <tr><th>System</th><th>Combinations</th><th>Key Security</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Google Auth (6-digit)</td>
+            <td class="lose">10⁶ = 1M</td>
+            <td class="lose">Static key forever</td>
+          </tr>
+          <tr>
+            <td>Google Auth (8-digit)</td>
+            <td class="mid">10⁸ = 100M</td>
+            <td class="lose">Static key forever</td>
+          </tr>
+          <tr>
+            <td>SafeWord (3 words + PIN)</td>
+            <td class="win">256³×100 = 1.67B</td>
+            <td class="mid">Static key</td>
+          </tr>
+          <tr>
+            <td style="color:var(--neon-cyan)">FSOTP + SafeWord ⭐</td>
+            <td class="win">1.67B per period</td>
+            <td class="win">Ratchet per 30s</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TOTP explanation -->
+    <div class="hiw-section">
+      <div class="hiw-head cyan">🔑 TOTP — How It Works</div>
+      <div class="hiw-text">
+        Standard TOTP (RFC 6238) — Facebook, Google, GitHub সব ব্যবহার করে:<br><br>
+        <span class="hiw-formula">Counter = floor(UnixTime / 30)</span>
+        <span class="hiw-formula">OTP = HMAC-SHA1(Secret, Counter) → 6 digits</span>
+        <br>
+        <span class="hl">ব্যবহার:</span> যেকোনো সার্ভিসের 2FA-তে কাজ করে।<br>
+        <span class="hla">দুর্বলতা:</span> Secret একবার চুরি হলে সব OTP কম্প্রোমাইজড।
+      </div>
+    </div>
+
+    <!-- SafeWord explanation -->
+    <div class="hiw-section">
+      <div class="hiw-head purple">🔤 SafeWord Mode — Word-Based OTP</div>
+      <div class="hiw-text">
+        SafeWord একই HMAC ব্যবহার করে কিন্তু <span class="hlp">256-word dictionary</span> থেকে কোড তৈরি করে:<br><br>
+        <span class="hiw-formula purple">HMAC-SHA256(Secret, Counter) → bytes</span>
+        <span class="hiw-formula purple">Word1 = DICT[byte₄], Word2 = DICT[byte₅], Word3 = DICT[byte₆]</span>
+        <span class="hiw-formula purple">PIN = byte₇ mod 100 → 2 digits</span>
+        <span class="hiw-formula purple">Result: "STORM·CIPHER·NOVA·47"</span>
+        <br>
+        <span class="hlg">সুবিধা:</span><br>
+        ✓ Shoulder-surfing কঠিন — digits মনে রাখা সহজ কিন্তু শব্দ লুকানো সহজ<br>
+        ✓ OCR/screenshot attack resist — শব্দ recognize করা কঠিন<br>
+        ✓ মানুষ মুখে বলে verify করতে পারে<br>
+        ✓ 1,677,721,600 combinations = Google Auth-এর <span class="hlg">1677 গুণ</span>
+      </div>
+    </div>
+
+    <!-- FSOTP explanation -->
+    <div class="hiw-section">
+      <div class="hiw-head cyan">🛡 FSOTP — Forward Secrecy</div>
+      <div class="hiw-text">
+        <span class="hl">Initialization:</span><br>
+        <span class="hiw-formula">S₀ = 256-bit random secret (encrypted in vault)</span>
+        <span class="hiw-formula">R₀ = CSPRNG random (fresh each period)</span>
+        <span class="hiw-formula">C₀ = SHA-256(R₀) = commitment (pre-published)</span>
+        <br>
+        <span class="hl">OTP Generation (period t):</span><br>
+        <span class="hiw-formula">msg = R_t ∥ period_counter</span>
+        <span class="hiw-formula">OTP_t = HMAC-SHA256(S_t, msg) → 6 digits</span>
+        <span class="hiw-formula">SafeWord_t = 3 words + PIN from same HMAC</span>
+        <br>
+        <span class="hl">Key Ratchet (every 30 seconds):</span><br>
+        <span class="hiw-formula">S_{t+1} = SHA-256(S_t ∥ R_t)  ← one-way!</span>
+        <span class="hiw-formula">R_{t+1} = new CSPRNG random  ← server keeps secret</span>
+        <br>
+        <span class="hlg">Forward Secrecy guarantee:</span><br>
+        S_t চুরি হলেও → S_{t+1} জানতে R_t লাগবে<br>
+        R_t period শেষে reveal হয় → কিন্তু R_{t+1} তখনও গোপন<br>
+        ∴ Future codes = <span class="hlg">গাণিতিকভাবে অসম্ভব!</span> (2²⁵⁶ operations)
+      </div>
+    </div>
+
+    <!-- Vault encryption -->
+    <div class="hiw-section">
+      <div class="hiw-head green">🔒 Vault Encryption</div>
+      <div class="hiw-text">
+        সব data সম্পূর্ণ <span class="hlg">locally encrypted</span>:<br><br>
+        <span class="hiw-formula green">Key = PBKDF2-SHA256(password, salt, 310,000 iterations)</span>
+        <span class="hiw-formula green">Stored = AES-256-GCM(key, accounts_json)</span>
+        <br>
+        ✓ <span class="hlg">310,000 iterations</span> — brute force = impractical<br>
+        ✓ <span class="hlg">Random salt</span> per vault — rainbow table useless<br>
+        ✓ <span class="hlg">GCM mode</span> — tampering detected automatically<br>
+        ✓ <span class="hlg">Zero transmission</span> — কোনো server নেই<br>
+        ✓ <span class="hlg">WebCrypto API</span> — browser native, no libraries
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     ADD ACCOUNT SCREEN
+══════════════════════════════════════════════════════════ -->
+<div data-screen="add" id="screen-add">
+  <div class="page-header">
+    <button class="back-btn" onclick="show('main')">←</button>
+    <div class="page-title">Add Account</div>
+  </div>
+
+  <div class="add-body">
+
+    <!-- TOTP / FSOTP mode selector -->
+    <div class="add-mode-tabs">
+      <button class="add-mode-tab active" id="amode-totp"
+        onclick="switchAddMode('totp')">🔑 TOTP — All Services</button>
+      <button class="add-mode-tab" id="amode-fsotp"
+        onclick="switchAddMode('fsotp')">🛡 FSOTP — Forward Secure</button>
+    </div>
+
+    <!-- ── TOTP Add Panel ── -->
+    <div id="apanel-totp">
+      <div class="add-tabs">
+        <button class="add-tab active" id="atab-qr"     onclick="switchAddTab('qr')">📷 Scan QR</button>
+        <button class="add-tab"        id="atab-manual" onclick="switchAddTab('manual')">✏ Manual</button>
+        <button class="add-tab"        id="atab-uri"    onclick="switchAddTab('uri')">🔗 Paste URI</button>
+      </div>
+
+      <!-- QR Pane -->
+      <div class="add-pane active" id="apane-qr">
+        <div class="scanner-wrap">
+          <video id="qr-video" autoplay muted playsinline></video>
+          <canvas id="qr-canvas"></canvas>
+          <div class="scan-overlay"><div class="scan-frame"></div></div>
+        </div>
+        <div id="scan-status" class="scan-status">Initialising camera…</div>
+
+        <div id="add-preview" class="preview-card hidden">
+          <div class="preview-title">✓ QR Detected — Review &amp; Save</div>
+          <div class="preview-grid">
+            <div class="pv"><label>Service</label><span id="pv-issuer"></span></div>
+            <div class="pv"><label>Account</label><span id="pv-account"></span></div>
+            <div class="pv"><label>Algorithm</label><span id="pv-algo"></span></div>
+            <div class="pv"><label>Digits</label><span id="pv-digits"></span></div>
+            <div class="pv"><label>Period</label><span id="pv-period"></span></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-ghost btn-sm" style="flex:1" onclick="rescan()">↺ Rescan</button>
+            <button class="btn btn-primary btn-sm" style="flex:1" onclick="confirmAdd()">Save Account</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manual Pane -->
+      <div class="add-pane" id="apane-manual">
+        <div class="form-group">
+          <label class="form-label">Service / Issuer</label>
+          <input type="text" id="m-issuer" placeholder="e.g. Facebook, Google, GitHub" autocomplete="off"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Account / Email *</label>
+          <input type="text" id="m-account" placeholder="user@example.com" autocomplete="off"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Secret Key (Base32) *</label>
+          <div class="pw-field">
+            <input type="password" id="m-secret" placeholder="JBSWY3DPEHPK3PXP…" autocomplete="off" spellcheck="false"/>
+            <button class="eye" onclick="toggleVis('m-secret',this)">👁</button>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Algorithm</label>
+            <select id="m-algo">
+              <option value="SHA1" selected>SHA-1 (default)</option>
+              <option value="SHA256">SHA-256</option>
+              <option value="SHA512">SHA-512</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Digits</label>
+            <select id="m-digits">
+              <option value="6" selected>6 digits</option>
+              <option value="8">8 digits</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Period</label>
+          <select id="m-period">
+            <option value="30" selected>30 seconds</option>
+            <option value="60">60 seconds</option>
+          </select>
+        </div>
+        <div id="m-err" class="form-err"></div>
+        <button class="btn btn-primary mt-8" id="m-add-btn" onclick="doAddManual()">Add Account</button>
+      </div>
+
+      <!-- URI Pane -->
+      <div class="add-pane" id="apane-uri">
+        <div class="form-group">
+          <label class="form-label">otpauth:// URI</label>
+          <input type="text" id="m-uri"
+            placeholder="otpauth://totp/Facebook:user@email.com?secret=…"
+            autocomplete="off" spellcheck="false"/>
+          <div id="m-uri-err" class="form-err mt-8"></div>
+        </div>
+        <p style="font-size:.76rem;color:var(--t2);line-height:1.7;font-family:var(--mono)">
+          কিছু service সরাসরি otpauth:// URI copy করতে দেয়। এখানে paste করুন।
+        </p>
+        <button class="btn btn-primary mt-8" onclick="doAddURI()">Import URI</button>
+      </div>
+    </div>
+
+    <!-- ── FSOTP Add Panel ── -->
+    <div id="apanel-fsotp" class="hidden">
+      <div class="fsotp-setup-card">
+        <div class="fsotp-setup-title">🛡 Forward-Secure OTP Setup</div>
+        <div class="fsotp-setup-desc">
+          FSOTP তোমার <b>নিজের সিস্টেম/অ্যাপের</b> জন্য।<br>
+          Secret চুরি হলেও future codes <b>গাণিতিকভাবে অসম্ভব</b> বের করা।<br>
+          Key প্রতি ৩০ সেকেন্ডে ratchet হয়ে নতুন হয়, পুরনোটা ধ্বংস হয়।
+        </div>
+        <div class="form-group">
+          <label class="form-label">System / App Name</label>
+          <input type="text" id="fs-name" placeholder="My Custom App" autocomplete="off"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Account Name</label>
+          <input type="text" id="fs-account" placeholder="admin" autocomplete="off"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">256-bit Secret Key (64 hex chars)</label>
+          <div style="display:flex;gap:8px">
+            <div class="pw-field" style="flex:1">
+              <input type="password" id="fs-secret" placeholder="Leave blank to auto-generate" autocomplete="off" spellcheck="false"/>
+              <button class="eye" onclick="toggleVis('fs-secret',this)">👁</button>
+            </div>
+            <button class="btn btn-ghost btn-sm" style="flex-shrink:0;white-space:nowrap" onclick="genFSOTPSecret()">⚡ Generate</button>
+          </div>
+        </div>
+        <div style="font-family:var(--mono);font-size:.68rem;color:var(--t3);margin-bottom:16px;line-height:1.8;padding:10px 12px;background:rgba(0,0,0,.25);border-radius:8px;border:1px solid rgba(191,0,255,.1)">
+          ⚠ Only one FSOTP account per vault<br>
+          🔒 Secret encrypted in AES-256-GCM vault<br>
+          ⚡ Key ratchets every 30s — previous keys permanently destroyed<br>
+          🛡 Enable SafeWord mode for 1677× stronger word-based codes
+        </div>
+        <button class="btn btn-violet" onclick="doAddFSOTP()">⚡ Activate FSOTP</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SETTINGS SCREEN
+══════════════════════════════════════════════════════════ -->
+<div data-screen="settings" id="screen-settings">
+  <div class="page-header">
+    <button class="back-btn" onclick="show('main')">←</button>
+    <div class="page-title">⚙ Settings</div>
+  </div>
+
+  <div class="settings-body">
+
+    <!-- Vault stats -->
+    <div class="s-section glass-sm">
+      <div class="s-head">Vault Status</div>
+      <div class="s-row">
+        <div><div class="s-label">Stored Accounts</div></div>
+        <div class="stat-badge" id="s-count">0</div>
+      </div>
+      <div class="s-row">
+        <div>
+          <div class="s-label">Encryption</div>
+          <div class="s-sub">AES-256-GCM + PBKDF2-SHA256 × 310,000</div>
+        </div>
+        <span style="color:var(--neon-green);font-size:.8rem">✓ On</span>
+      </div>
+      <div class="s-row">
+        <div>
+          <div class="s-label">Data Transmission</div>
+          <div class="s-sub">Nothing sent to any server</div>
+        </div>
+        <span style="color:var(--neon-green);font-size:.8rem">✓ Zero</span>
+      </div>
+    </div>
+
+    <!-- Auto-lock -->
+    <div class="s-section glass-sm">
+      <div class="s-head">Security</div>
+      <div class="s-row">
+        <div style="flex:1">
+          <div class="s-label">Auto-lock Timeout</div>
+          <div class="s-sub">Seconds idle before locking</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="number" class="s-mini-input" id="s-idle" value="60" min="10" max="600"/>
+          <button class="btn btn-ghost btn-sm" onclick="doSetIdle()">Set</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Change password -->
+    <div class="s-section glass-sm">
+      <div class="s-head">Change Master Password</div>
+      <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+        <div class="pw-field">
+          <input type="password" id="s-cur" placeholder="Current password" autocomplete="current-password"/>
+          <button class="eye" onclick="toggleVis('s-cur',this)">👁</button>
+        </div>
+        <div class="pw-field">
+          <input type="password" id="s-new" placeholder="New password (min 8)" autocomplete="new-password"/>
+          <button class="eye" onclick="toggleVis('s-new',this)">👁</button>
+        </div>
+        <div class="pw-field">
+          <input type="password" id="s-cnf" placeholder="Confirm new password" autocomplete="new-password"/>
+          <button class="eye" onclick="toggleVis('s-cnf',this)">👁</button>
+        </div>
+        <button class="btn btn-ghost btn-sm btn-block" onclick="doChangePw()">Update Password</button>
+      </div>
+    </div>
+
+    <!-- Backup -->
+    <div class="s-section glass-sm">
+      <div class="s-head">Backup &amp; Restore</div>
+      <div class="s-row">
+        <div>
+          <div class="s-label">Export Encrypted Backup</div>
+          <div class="s-sub">Saves as encrypted JSON — safe to store anywhere</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="doExport()">Export</button>
+      </div>
+      <div class="s-row">
+        <div>
+          <div class="s-label">Import Backup</div>
+          <div class="s-sub">Restore from encrypted JSON file</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="doImport()">Import</button>
+      </div>
+    </div>
+
+    <!-- Danger -->
+    <div class="s-section glass-sm">
+      <div class="s-head" style="color:var(--neon-red)">⚠ Danger Zone</div>
+      <div class="s-row">
+        <div><div class="s-label">Lock Vault</div></div>
+        <button class="btn btn-danger btn-sm" onclick="doLock()">Lock Now</button>
+      </div>
+      <div class="s-row">
+        <div>
+          <div class="s-label">Wipe All Data</div>
+          <div class="s-sub">Delete vault and all accounts permanently</div>
+        </div>
+        <button class="btn btn-danger btn-sm"
+          onclick="if(confirm('Wipe everything? Cannot be undone!')){localStorage.clear();location.reload()}">
+          Wipe
+        </button>
+      </div>
+    </div>
+
+    <!-- About -->
+    <div class="s-section glass-sm">
+      <div class="s-head">About SafeWord NextGen</div>
+      <div style="padding:14px 16px;font-family:var(--mono);font-size:.7rem;color:var(--t2);line-height:2.1">
+        <div>TOTP Standard: <span style="color:var(--neon-cyan)">RFC 6238 / RFC 4226</span></div>
+        <div>FSOTP: <span style="color:var(--neon-purple)">HMAC-SHA256 + Key Ratcheting + Commitment</span></div>
+        <div>SafeWord: <span style="color:var(--neon-purple)">256-word dict · 1.67B combos · 1677× stronger</span></div>
+        <div>Vault Encryption: <span style="color:var(--neon-cyan)">AES-256-GCM</span></div>
+        <div>Key Derivation: <span style="color:var(--neon-cyan)">PBKDF2-SHA256 × 310,000</span></div>
+        <div>Random: <span style="color:var(--neon-cyan)">crypto.getRandomValues (CSPRNG)</span></div>
+        <div>External: <span style="color:var(--neon-cyan)">jsQR v1.4 (QR scanning only)</span></div>
+        <div style="margin-top:10px;color:var(--t3)">All crypto via WebCrypto API. Zero server transmission.</div>
+        <div style="margin-top:6px;color:var(--neon-purple)">v3.0 · © Humayun Shariar Himu</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<!-- ── Footer ────────────────────────────────────────────── -->
+<footer class="app-footer">
+  <span>SafeWord</span> 🛡
+  <a href="https://github.com/HumayunShariarHimu" target="_blank" rel="noopener">Humayun Shariar Himu</a> ·
+  <span style="color:var(--neon-purple)"></span>
+</footer>
+
+<!-- Scripts -->
+<script src="./core.js"></script>
+<script src="./scanner.js"></script>
+<script src="./app.js"></script>
+<script>
+/* ── Matrix Rain Effect ──────────────────────────────────── */
+(function(){
+  const canvas=document.getElementById('matrix-canvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*<>{}[]|;:,.!?~`'.split('');
+  const cols=Math.floor(window.innerWidth/18);
+  const drops=Array(cols).fill(1);
+  function draw(){
+    ctx.fillStyle='rgba(1,2,4,0.05)';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.font='14px "Share Tech Mono",monospace';
+    for(let i=0;i<drops.length;i++){
+      const ch=chars[Math.floor(Math.random()*chars.length)];
+      const alpha=Math.random()>.7?1:.3;
+      ctx.fillStyle=`rgba(0,245,255,${alpha})`;
+      ctx.fillText(ch,i*18,drops[i]*18);
+      if(drops[i]*18>canvas.height&&Math.random()>.975)drops[i]=0;
+      drops[i]++;
+    }
+  }
+  setInterval(draw,80);
+})();
+
+/* ── filterAccounts ─────────────────────────────────────── */
+function filterAccounts(q){
+  document.querySelectorAll('.acc-card').forEach(c=>{
+    c.style.display=c.textContent.toLowerCase().includes(q.toLowerCase())?'':'none';
+  });
+}
+
+/* ── switchAddMode ──────────────────────────────────────── */
+function switchAddMode(mode){
+  ['totp','fsotp'].forEach(m=>{
+    document.getElementById('amode-'+m).classList.toggle('active',m===mode);
+    document.getElementById('apanel-'+m).classList.toggle('hidden',m!==mode);
+  });
+  if(mode==='totp')switchAddTab('qr');
+  else if(scanner.isActive())scanner.stop();
+}
+
+/* ── FSOTP intro visibility ─────────────────────────────── */
+const _orig=renderFSOTPCards;
+async function renderFSOTPCards(){
+  const intro=document.getElementById('fsotp-intro');
+  const hasFS=vault.accounts.some(a=>a.mode==='fsotp');
+  if(intro)intro.style.display=hasFS?'none':'block';
+  await _orig();
+}
+
+/* ── copyText2 global helper ────────────────────────────── */
+async function copyText2(str){
+  if(!str)return;
+  try{await navigator.clipboard.writeText(str);toast('Copied!','success');}
+  catch{toast('Copy failed','error');}
+}
+</script>
+
+</body>
+</html>

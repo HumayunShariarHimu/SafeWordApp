@@ -1,0 +1,20 @@
+{
+  "name": "SafeWord NextGen — Beyond Google Auth",
+  "short_name": "SafeWord",
+  "description": "Next-gen authenticator: TOTP + FSOTP + SafeWord mode. 1677× stronger than Google Auth. AES-256-GCM encrypted vault.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#010204",
+  "theme_color": "#010204",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%23010204'/><text y='380' x='60' font-size='380'>🛡</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["security", "utilities"],
+  "lang": "en"
+}
